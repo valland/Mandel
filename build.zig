@@ -27,6 +27,12 @@ pub fn build(b: *std.Build) void {
     animation_mod.addObjectFile(b.path(".tools/native/lib/libgmp.a"));
     const animation = b.addExecutable(.{ .name = "mandel-animation-bench", .root_module = animation_mod });
     b.step("bench-animation", "Measure real-time offscreen zoom animation").dependOn(&b.addRunArtifact(animation).step);
+    const cpu_mod = b.createModule(.{ .root_source_file = b.path("src/cpu_tests.zig"), .target = target, .optimize = optimize, .link_libc = true });
+    cpu_mod.addObjectFile(b.path(".tools/native/lib/libmpfr.a"));
+    cpu_mod.addObjectFile(b.path(".tools/native/lib/libgmp.a"));
+    const cpu_tests = b.addTest(.{ .root_module = cpu_mod });
+    b.step("test-cpu", "Test numerics and persistence without a GPU").dependOn(&b.addRunArtifact(cpu_tests).step);
     const tests = b.addTest(.{ .root_module = mod });
+    b.step("test-build", "Compile the full test suite without running it").dependOn(&tests.step);
     b.step("test", "Check the fractal engine and native UI").dependOn(&b.addRunArtifact(tests).step);
 }

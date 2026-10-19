@@ -4,6 +4,20 @@ A native Mandelbrot explorer built with Zig 0.17.0 and NanoUI. macOS / Apple Sil
 
 ![Saved areas gallery](docs/screenshots/saved-areas.png)
 
+## Download and verify
+
+Download `Mandel-macos-arm64.zip` from [GitHub Releases](https://github.com/valland/Mandel/releases). Release builds target Apple Silicon on macOS 15 or later. Verify a downloaded release with:
+
+```sh
+gh attestation verify Mandel-macos-arm64.zip --repo valland/Mandel
+```
+
+Tagged releases are built by GitHub Actions and carry Sigstore build-provenance attestations for both the app ZIP and corresponding source archive. These attestations bind the artifact hashes to the workflow and source commit; they are not Apple code signing or a guarantee of reproducible builds. The app is ad-hoc signed, not notarized; Gatekeeper may require approval through System Settings → Privacy & Security → Open Anyway.
+
+CI runs `test-cpu` and compiles the full test suite with `test-build`. Run `test` on a physical Mac to exercise Metal and native UI as well. To publish a new version, update the versions in `build.zig.zon` and `tools/package.sh`, commit, and push a matching `vX.Y.Z` tag. Branch builds produce workflow artifacts; only tag pushes publish and attest releases.
+
+Mandel is MIT licensed. Releases include corresponding library sources and license notices; see [DISTRIBUTION.md](DISTRIBUTION.md) for rebuilding with modified GMP/MPFR libraries.
+
 ## Build and run
 
 Requires an Apple Silicon Mac and Xcode Command Line Tools (`xcode-select --install`).

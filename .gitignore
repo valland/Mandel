@@ -8,3 +8,5 @@ zig-out/
 .env.*
 !.env.example
 places.json
+
+dist/
