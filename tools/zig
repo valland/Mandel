@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+export ZIG_GLOBAL_CACHE_DIR="$ROOT/.tools/zig-cache"
+exec "$ROOT/.tools/zig-aarch64-macos-0.17.0/zig" "$@"

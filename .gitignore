@@ -1,0 +1,10 @@
+.tools/
+.zig-cache/
+zig-out/
+.DS_Store
+
+# Local credentials and personal data
+.env
+.env.*
+!.env.example
+places.json

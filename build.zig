@@ -1,0 +1,32 @@
+const std = @import("std");
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+    const dep = b.dependency("nanoui", .{ .target = target, .optimize = optimize });
+    const mod = b.createModule(.{ .root_source_file = b.path("src/main.zig"), .target = target, .optimize = optimize, .link_libc = true });
+    mod.addImport("nanoui", dep.module("nanoui"));
+    mod.addIncludePath(b.path(".tools/native/include"));
+    mod.addObjectFile(b.path(".tools/native/lib/libmpfr.a"));
+    mod.addObjectFile(b.path(".tools/native/lib/libgmp.a"));
+    const exe = b.addExecutable(.{ .name = "Mandel", .root_module = mod });
+    b.installArtifact(exe);
+    const run = b.addRunArtifact(exe);
+    run.addPassthruArgs();
+    b.step("run", "Run Mandel").dependOn(&run.step);
+    const bench_mod = b.createModule(.{ .root_source_file = b.path("src/bench.zig"), .target = target, .optimize = optimize, .link_libc = true });
+    bench_mod.addImport("nanoui", dep.module("nanoui"));
+    bench_mod.addObjectFile(b.path(".tools/native/lib/libmpfr.a"));
+    bench_mod.addObjectFile(b.path(".tools/native/lib/libgmp.a"));
+    const bench = b.addExecutable(.{ .name = "mandel-bench", .root_module = bench_mod });
+    const bench_run = b.addRunArtifact(bench);
+    bench_run.addPassthruArgs();
+    b.step("bench", "Measure representative renders").dependOn(&bench_run.step);
+    const animation_mod = b.createModule(.{ .root_source_file = b.path("src/animation_bench.zig"), .target = target, .optimize = optimize, .link_libc = true });
+    animation_mod.addImport("nanoui", dep.module("nanoui"));
+    animation_mod.addObjectFile(b.path(".tools/native/lib/libmpfr.a"));
+    animation_mod.addObjectFile(b.path(".tools/native/lib/libgmp.a"));
+    const animation = b.addExecutable(.{ .name = "mandel-animation-bench", .root_module = animation_mod });
+    b.step("bench-animation", "Measure real-time offscreen zoom animation").dependOn(&b.addRunArtifact(animation).step);
+    const tests = b.addTest(.{ .root_module = mod });
+    b.step("test", "Check the fractal engine and native UI").dependOn(&b.addRunArtifact(tests).step);
+}

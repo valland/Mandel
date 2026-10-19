@@ -1,0 +1,1 @@
+.{ .name = .mandel, .version = "0.7.0", .fingerprint = 0x6953b287ed202857, .minimum_zig_version = "0.17.0", .dependencies = .{ .nanoui = .{ .path = "vendor/nanoui" } }, .paths = .{ "build.zig", "build.zig.zon", "src", "vendor" } }
